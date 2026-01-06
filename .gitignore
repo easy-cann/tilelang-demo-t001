@@ -1,0 +1,7 @@
+.arts/
+.venv/
+.vscode/
+extra-info/
+logs/
+*.so
+*.log
