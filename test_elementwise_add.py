@@ -16,6 +16,7 @@ result = lib.call(
     ctypes.c_void_p(c.data_ptr()),
     torch.npu.current_stream()._as_parameter_
 )
+print(f"result={result}")
 
 torch.npu.synchronize()
 print(f"Kernel Output Is: {c}")
