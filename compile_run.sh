@@ -1,6 +1,7 @@
+SCRIPT_DIR=$(dirname $(readlink -f "${BASH_SOURCE[0]}"))
 export TL_ROOT=/home/developer/workspace/git/github/tile-ai/tilelang-ascend
 
-rm -rf ./test_elementwise_add.so
+rm -rf ${SCRIPT_DIR}/test_elementwise_add.so
 bisheng \
     --npu-arch=dav-2201 \
     -O2 -std=c++17 -xasc \
@@ -14,7 +15,7 @@ bisheng \
     -I${TL_ROOT}/3rdparty/catlass/include \
     -L${ASCEND_HOME_PATH}/lib64 \
     -lruntime -lascendcl -lm -ltiling_api -lplatform -lc_sec -ldl \
-    -fPIC --shared ./test_elementwise_add.cpp -o ./test_elementwise_add.so
+    -fPIC --shared ${SCRIPT_DIR}/test_elementwise_add.cpp -o ${SCRIPT_DIR}/test_elementwise_add.so
 
 echo "Compile Success."
-python ./test_elementwise_add.py
+python ${SCRIPT_DIR}/test_elementwise_add.py

@@ -1,3 +1,4 @@
+from pathlib import Path
 import torch
 import ctypes
 
@@ -9,6 +10,7 @@ a = torch.randn((M, N), dtype=torch.float)
 b = torch.randn((M, N), dtype=torch.float)
 c = torch.empty((M, N), dtype=torch.float)
 
+SCRIPT_DIR = Path(__file__).resolve().parent
 lib = ctypes.CDLL("./test_elementwise_add.so")
 result = lib.call(
     ctypes.c_void_p(a.data_ptr()),
