@@ -13,7 +13,10 @@ bisheng \
     -I${ASCEND_HOME_PATH}/pkg_inc/profiling \
     -I${TL_ROOT}/src \
     -I${TL_ROOT}/3rdparty/catlass/include \
+    -I${TL_ROOT}/3rdparty/shmem/include \
+    -I${TL_ROOT}/3rdparty/shmem/src/device \
     -L${ASCEND_HOME_PATH}/lib64 \
+    -Wno-macro-redefined -Wno-ignored-attributes -Wno-non-c-typedef-for-linkage \
     -lruntime -lascendcl -lm -ltiling_api -lplatform -lc_sec -ldl \
     -fPIC --shared ${SCRIPT_DIR}/test_elementwise_add.cpp -o ${SCRIPT_DIR}/test_elementwise_add.so
 
