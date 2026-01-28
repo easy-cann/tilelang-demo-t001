@@ -5,6 +5,7 @@ import sys
 TL_ROOT="/home/developer/workspace/git/github/tile-ai/tilelang-ascend"
 os.environ['TL_ROOT'] = f"{TL_ROOT}"
 os.environ['PYTHONPATH'] = f"{TL_ROOT}:{os.environ['PYTHONPATH']}"
+os.environ['ACL_OP_INIT_MODE'] = "1"
 sys.path.append(f"{TL_ROOT}")
 
 import tilelang
@@ -21,11 +22,16 @@ args = parser.parse_args()
 M = args.m
 N = args.n
 
+pass_configs = {
+    tilelang.PassConfigKey.TL_ASCEND_AUTO_SYNC: True
+}
 
-@tilelang.jit(out_idx=[-1])
+@tilelang.jit(out_idx=[-1], pass_configs=pass_configs)
 def vec_add(M, N, block_M, block_N, dtype="float"):
     m_num = M // block_M
     n_num = N // block_N
+
+    block_NN = 32
 
     VEC_NUM = 2
 
@@ -39,18 +45,19 @@ def vec_add(M, N, block_M, block_N, dtype="float"):
             bx = cid // n_num
             by = cid % n_num
 
-            a_ub = T.alloc_ub((block_M // VEC_NUM, block_N), dtype)
-            b_ub = T.alloc_ub((block_M // VEC_NUM, block_N), dtype)
-            c_ub = T.alloc_ub((block_M // VEC_NUM, block_N), dtype)
+            a_ub = T.alloc_ub((block_M // VEC_NUM, block_NN), dtype)
+            b_ub = T.alloc_ub((block_M // VEC_NUM, block_NN), dtype)
+            c_ub = T.alloc_ub((block_M // VEC_NUM, block_NN), dtype)
             with T.Scope("V"):
-                T.copy(A[bx * block_M + vid * block_M // VEC_NUM, by * block_N], a_ub)
-                T.copy(B[bx * block_M + vid * block_M // VEC_NUM, by * block_N], b_ub)
+                for n_i in T.Pipelined(T.ceildiv(block_N, block_NN), num_stages=2):
+                    T.copy(A[bx * block_M + vid * block_M // VEC_NUM, by * block_N + n_i * block_NN], a_ub)
+                    T.copy(B[bx * block_M + vid * block_M // VEC_NUM, by * block_N + n_i * block_NN], b_ub)
 
-                T.barrier_all()
-                T.tile.add(c_ub, a_ub, b_ub)
-                T.barrier_all()
+                    # T.barrier_all()
+                    T.tile.add(c_ub, a_ub, b_ub)
+                    # T.barrier_all()
 
-                T.copy(c_ub, C[bx * block_M + vid * block_M // VEC_NUM, by * block_N])
+                    T.copy(c_ub, C[bx * block_M + vid * block_M // VEC_NUM, by * block_N + n_i * block_NN])
 
     return main
 
