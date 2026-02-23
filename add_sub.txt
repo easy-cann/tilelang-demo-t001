@@ -1,0 +1,49 @@
+T.ascend_add(
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		acc_s_ub, 
+		0, 
+		8192, 
+		2
+	), 
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		acc_s_ub, 
+		0, 
+		8192, 
+		1
+	), 
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		acc_s_ub_, 
+		0, 
+		8192, 
+		1
+	), 
+	8192
+)
+
+T.ascend_sub(
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		m_i_prev, 
+		i * 64, 
+		64, 
+		2
+	), 
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		m_i_prev, 
+		i * 64, 
+		64, 
+		1
+	), 
+	T.tvm_access_ptr(
+		T.type_annotation("float32"), 
+		m_i, 
+		0, 
+		64, 
+		1
+	), 
+	64
+)
