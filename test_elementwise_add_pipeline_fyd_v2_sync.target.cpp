@@ -20,7 +20,7 @@ extern "C" __global__ __aicore__ void main_kernel( GM_ADDR A_handle,  GM_ADDR B_
   AscendC::TBuf<AscendC::TPosition::A2> ascend_l0a;
   pipe.InitBuffer(ascend_l0a, 65536);
   AscendC::TBuf<AscendC::TPosition::B2> ascend_l0b;
-  pipe.InitBuffer(ascend_l0b, 131072);
+  pipe.InitBuffer(ascend_l0b, 65536);
   AscendC::TBuf<AscendC::TPosition::A1> ascend_l1; pipe.InitBuffer(ascend_l1, 524032);
   AscendC::TBuf<AscendC::TPosition::CO1> ascend_l0c; pipe.InitBuffer(ascend_l0c, 131072);
   AscendC::TBuf<AscendC::TPosition::VECCALC> ascend_ub; pipe.InitBuffer(ascend_ub, 196352);
@@ -48,23 +48,23 @@ extern "C" __global__ __aicore__ void main_kernel( GM_ADDR A_handle,  GM_ADDR B_
       AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>((n_i % 2));
       AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>((n_i % 2));
       AscendC::Add(c_ub[((n_i % 2) * 2048)], a_ub[((n_i % 2) * 2048)], b_ub[((n_i % 2) * 2048)], 2048);
-      
+
       AscendC::SetFlag<AscendC::HardEvent::V_MTE2>((n_i % 2));
       AscendC::WaitFlag<AscendC::HardEvent::V_MTE2>((n_i % 2));
       tl::ascend::copy_gm_to_ub<float, 32, 64>(a_ub[((n_i % 2) * 2048)], A[((((((cid / 4) * 131072) + (vid * 65536)) + ((cid % 4) * 256)) + (n_i * 32)) + 64)], 1024);
       tl::ascend::copy_gm_to_ub<float, 32, 64>(b_ub[((n_i % 2) * 2048)], B[((((((cid / 4) * 131072) + (vid * 65536)) + ((cid % 4) * 256)) + (n_i * 32)) + 64)], 1024);
-      
+
       AscendC::SetFlag<AscendC::HardEvent::V_MTE3>((n_i % 2));
       AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>((n_i % 2));
       tl::ascend::copy_ub_to_gm<float, 32, 64>(C[(((((cid / 4) * 131072) + (vid * 65536)) + ((cid % 4) * 256)) + (n_i * 32))], c_ub[((n_i % 2) * 2048)], 1024);
-      
+
       AscendC::SetFlag<AscendC::HardEvent::MTE2_V>((n_i % 2));
       AscendC::SetFlag<AscendC::HardEvent::MTE3_V>((n_i % 2));
     }
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(0);
     AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(0);
     AscendC::Add(c_ub[0], a_ub[0], b_ub[0], 2048);
-    
+
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(0);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(0);
     tl::ascend::copy_ub_to_gm<float, 32, 64>(C[(((((cid / 4) * 131072) + (vid * 65536)) + ((cid % 4) * 256)) + 192)], c_ub[0], 1024);
@@ -72,7 +72,7 @@ extern "C" __global__ __aicore__ void main_kernel( GM_ADDR A_handle,  GM_ADDR B_
     AscendC::WaitFlag<AscendC::HardEvent::MTE2_V>(1);
     AscendC::WaitFlag<AscendC::HardEvent::MTE3_V>(1);
     AscendC::Add(c_ub[2048], a_ub[2048], b_ub[2048], 2048);
-    
+
     AscendC::SetFlag<AscendC::HardEvent::V_MTE3>(1);
     AscendC::WaitFlag<AscendC::HardEvent::V_MTE3>(1);
     tl::ascend::copy_ub_to_gm<float, 32, 64>(C[(((((cid / 4) * 131072) + (vid * 65536)) + ((cid % 4) * 256)) + 224)], c_ub[2048], 1024);

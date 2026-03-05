@@ -20,7 +20,7 @@ extern "C" __global__ __aicore__ void main_kernel( GM_ADDR A_handle,  GM_ADDR B_
   AscendC::TBuf<AscendC::TPosition::A2> ascend_l0a;
   pipe.InitBuffer(ascend_l0a, 65536);
   AscendC::TBuf<AscendC::TPosition::B2> ascend_l0b;
-  pipe.InitBuffer(ascend_l0b, 131072);
+  pipe.InitBuffer(ascend_l0b, 65536);
   AscendC::TBuf<AscendC::TPosition::A1> ascend_l1; pipe.InitBuffer(ascend_l1, 524032);
   AscendC::TBuf<AscendC::TPosition::CO1> ascend_l0c; pipe.InitBuffer(ascend_l0c, 131072);
   AscendC::TBuf<AscendC::TPosition::VECCALC> ascend_ub; pipe.InitBuffer(ascend_ub, 196352);
